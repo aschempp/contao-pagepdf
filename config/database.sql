@@ -15,6 +15,8 @@ CREATE TABLE `tl_page` (
   `pdfAuthor` varchar(255) NOT NULL default '',
   `pdfFilename` varchar(255) NOT NULL default '',
   `pdfOrientation` varchar(9) NOT NULL default '',
-  `pdfImageQuality` varchar(3) NOT NULL default '75',
+  `pdfImageQuality` varchar(3) NOT NULL default '',
+  `pdfLayout` int(10) unsigned NOT NULL default '0',
+  `pdfCache` varchar(7) NOT NULL default '',
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

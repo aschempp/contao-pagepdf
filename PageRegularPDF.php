@@ -47,6 +47,18 @@ class PageRegularPDF extends PageRegular
 			return parent::generate($objPage);
 		}
 		
+		$objPage = $this->inheritPDFData($objPage);
+		
+		if ($objPage->pdfLayout)
+		{
+			$objPage->layout = $objPage->pdfLayout;
+		}
+		
+		if (intval($objPage->pdfCache) > 0)
+		{
+			$objPage->cache = $objPage->pdfCache;
+		}
+		
 		$strBuffer = null;
 		
 		// Disable gzip compression
@@ -108,6 +120,18 @@ class PageRegularPDF extends PageRegular
 				$strBuffer = ob_get_contents();
 				ob_end_clean();
 			}
+			elseif ($objPage->pdfCache == '-1')
+			{
+				$latest = $this->Database->prepare("SELECT tstamp AS article_tstamp, (SELECT tstamp FROM tl_content WHERE tl_content.pid=tl_article.id ORDER BY tstamp DESC LIMIT 0,1) AS content_tstamp FROM tl_article WHERE pid=? ORDER BY tstamp DESC")->limit(1)->execute($objPage->id);
+				$latest = $latest->article_tstamp > $objPage->tstamp ? ($latest->content_tstamp > $latest->article_tstamp ? $latest->content_tstamp : $latest->article_tstamp) : ($objPage->tstamp > $latest->content_tstamp ? $objPage->tstamp : $latest->content_tstamp);
+				
+				if ($latest <= $expire)
+				{
+					// Read buffer
+					$strBuffer = ob_get_contents();
+					ob_end_clean();
+				}
+			}
 		}
 		
 		
@@ -135,7 +159,7 @@ class PageRegularPDF extends PageRegular
 				'Title'				=> (strlen($objPage->pageTitle) ? $objPage->pageTitle : $objPage->title),
 				'Author'			=> $objPage->pdfAuthor,
 				'FileName'			=> $objPage->pdfFilename,
-				'ImageQuality'		=> $objPage->pdfImageQuality,
+				'ImageQuality'		=> ($objPage->pdfImageQuality ? $objPage->pdfImageQuality : 75),
 				'FooterText'		=> 'blank',
 			);
 			
@@ -154,7 +178,7 @@ class PageRegularPDF extends PageRegular
 			$strBuffer = $objRequest->response;
 	
 			// Cache page if it is not protected
-			if (empty($_POST) && !BE_USER_LOGGED_IN && !FE_USER_LOGGED_IN && intval($objPage->cache) > 0 && !$objPage->protected)
+			if (empty($_POST) && !BE_USER_LOGGED_IN && ((!FE_USER_LOGGED_IN && intval($objPage->cache) > 0 && !$objPage->protected) || strlen($objPage->pdfCache)))
 			{
 				// Do not cache empty requests
 				if (strlen($this->Environment->request) && $this->Environment->request != 'index.php')
@@ -176,6 +200,26 @@ class PageRegularPDF extends PageRegular
 		echo $strBuffer;
 		
 		exit;
+	}
+	
+	
+	protected function inheritPDFData($objPage)
+	{
+		$objParentPage = $objPage;
+
+		while( $objParentPage->numRows && $objParentPage->pid > 0 && (!strlen($objPage->pdfAuthor) || !strlen($objPage->pdfFilename) || !strlen($objPage->pdfOrientation) || !strlen($objPage->pdfImageQuality) || !strlen($objPage->pdfCache) || !$objPage->pdfLayout) )
+		{
+			$objParentPage = $this->Database->prepare("SELECT * FROM tl_page WHERE id=?")->limit(1)->execute($objParentPage->pid);
+			
+			if (!strlen($objPage->pdfAuthor)) $objPage->pdfAuthor = $objParentPage->pdfAuthor;
+			if (!strlen($objPage->pdfFilename)) $objPage->pdfFilename = $objParentPage->pdfFilename;
+			if (!strlen($objPage->pdfOrientation)) $objPage->pdfOrientation = $objParentPage->pdfOrientation;
+			if (!strlen($objPage->pdfImageQuality)) $objPage->pdfImageQuality = $objParentPage->pdfImageQuality;
+			if (!strlen($objPage->pdfCache)) $objPage->pdfCache = $objParentPage->pdfCache;
+			if (!$objPage->pdfLayout) $objPage->pdfLayout = $objParentPage->pdfLayout;
+		}
+		
+		return $objPage;
 	}
 }
 
