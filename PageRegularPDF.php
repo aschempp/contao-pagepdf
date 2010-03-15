@@ -117,7 +117,7 @@ class PageRegularPDF extends PageRegular
 			if ($expire >= time())
 			{
 				// Read buffer
-				$strBuffer = ob_get_contents();
+				$strBuffer = base64_decode(ob_get_contents());
 				ob_end_clean();
 			}
 			elseif ($objPage->pdfCache == '-1')
@@ -128,7 +128,7 @@ class PageRegularPDF extends PageRegular
 				if ($latest <= $expire)
 				{
 					// Read buffer
-					$strBuffer = ob_get_contents();
+					$strBuffer = base64_decode(ob_get_contents());
 					ob_end_clean();
 				}
 			}
@@ -187,7 +187,7 @@ class PageRegularPDF extends PageRegular
 	
 					// Create cache file
 					$objFile = new File($strCacheFile);
-					$objFile->write('<?php $expire = ' . $intCache . '; $content = "application/pdf"; ?>' . $this->escapeShortOpenTags($strBuffer));
+					$objFile->write('<?php $expire = ' . $intCache . '; $content = "application/pdf"; ?>' . base64_encode($strBuffer));
 					$objFile->close();
 				}
 			}
@@ -220,18 +220,6 @@ class PageRegularPDF extends PageRegular
 		}
 		
 		return $objPage;
-	}
-	
-	
-	protected function escapeShortOpenTags($strBuffer)
-	{
-		if (!ini_get('short_open_tags'))
-			return $strBuffer;
-			
-		$strBuffer = str_replace('<?', "<?php echo '<?'; ?>", $strBuffer);
-		$strBuffer = str_replace('<%', "<?php echo '<%'; ?>", $strBuffer);
-		
-		return $strBuffer;
 	}
 }
 
