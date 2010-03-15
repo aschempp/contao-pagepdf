@@ -187,7 +187,7 @@ class PageRegularPDF extends PageRegular
 	
 					// Create cache file
 					$objFile = new File($strCacheFile);
-					$objFile->write('<?php $expire = ' . $intCache . '; $content = "application/pdf"; ?>' . $strBuffer);
+					$objFile->write('<?php $expire = ' . $intCache . '; $content = "application/pdf"; ?>' . $this->escapeShortOpenTags($strBuffer));
 					$objFile->close();
 				}
 			}
@@ -220,6 +220,18 @@ class PageRegularPDF extends PageRegular
 		}
 		
 		return $objPage;
+	}
+	
+	
+	protected function escapeShortOpenTags($strBuffer)
+	{
+		if (!ini_get('short_open_tags'))
+			return $strBuffer;
+			
+		$strBuffer = str_replace('<?', "<?php echo '<?'; ?>", $strBuffer);
+		$strBuffer = str_replace('<%', "<?php echo '<%'; ?>", $strBuffer);
+		
+		return $strBuffer;
 	}
 }
 
