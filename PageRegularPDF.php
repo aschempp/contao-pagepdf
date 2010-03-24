@@ -194,8 +194,13 @@ class PageRegularPDF extends PageRegular
 		}
 		
 		// Push PDF to screen
+		header('Cache-Control: public, must-revalidate, max-age=0'); // HTTP/1.1
+		header('Pragma: public');
+		header('Expires: Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+		header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');	
+		header('Content-Length: '.strlen($strBuffer));
 		header('Content-Type: application/pdf');
-		header('Content-Disposition: inline; filename="'.($objPage->pdfFilename ? $objPage->pdfFilename : $objPage->alias).'.pdf";');
+		header('Content-Disposition: attachement; filename="'.($objPage->pdfFilename ? $objPage->pdfFilename : $objPage->alias).'.pdf";');
 		
 		echo $strBuffer;
 		
