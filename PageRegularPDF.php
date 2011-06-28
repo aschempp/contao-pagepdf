@@ -175,6 +175,11 @@ class PageRegularPDF extends PageRegular
 			// IMPORTANT! Drop temporary file, otherwise protected pages could be visible to anyone
 			$objFile->delete();
 			
+			if ($objRequest->code < 200 || $objRequest->code > 299)
+			{
+				die('html2pdf Error: ' . $objRequest->code . ' ' . $objRequest->error);
+			}
+			
 			$strBuffer = $objRequest->response;
 	
 			// Cache page if it is not protected
