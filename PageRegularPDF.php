@@ -144,7 +144,7 @@ class PageRegularPDF extends PageRegular
 			ob_end_clean();
 			
 			// Write buffer to temporary file
-			$strFile = 'system/html/' . uniqid();
+			$strFile = 'system/html/' . uniqid() . '.html';
 			$objFile = new File($strFile);
 			$objFile->write($this->replaceInsertTags($strBuffer));
 			$objFile->close();
