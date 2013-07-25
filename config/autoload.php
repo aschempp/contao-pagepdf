@@ -19,8 +19,10 @@
 
 
 /**
- * Page types
+ * Register the classes
  */
-$GLOBALS['TL_PTY']['regular']	= 'PageRegularPDF';
-$GLOBALS['TL_PTY']['pdf']		= 'PagePDF';
-
+ClassLoader::addClasses(array
+(
+	'PagePDF' => 'system/modules/pagepdf/PagePDF.php',
+	'PageRegularPDF' => 'system/modules/pagepdf/PageRegularPDF.php',
+));
