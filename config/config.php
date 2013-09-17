@@ -24,3 +24,8 @@
 $GLOBALS['TL_PTY']['regular']	= 'PageRegularPDF';
 $GLOBALS['TL_PTY']['pdf']		= 'PagePDF';
 
+
+/**
+ * Hooks
+ */
+$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('PagePDFHelper', 'replaceTags');
