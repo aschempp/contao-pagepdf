@@ -24,5 +24,6 @@
 ClassLoader::addClasses(array
 (
 	'PagePDF' => 'system/modules/pagepdf/PagePDF.php',
+	'PagePDFHelper' => 'system/modules/pagepdf/PagePDFHelper.php',
 	'PageRegularPDF' => 'system/modules/pagepdf/PageRegularPDF.php',
 ));
